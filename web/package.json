@@ -1,0 +1,30 @@
+{
+  "name": "frontend-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0",
+    "@element-plus/icons-vue": "^2.3.1",
+    "@solana/web3.js": "^1.87.6",
+    "@vueuse/core": "^12.7.0",
+    "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
+    "element-plus": "^2.9.4",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0",
+    "vue-tsc": "^2.2.0"
+  }
+}

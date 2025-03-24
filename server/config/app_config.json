@@ -1,0 +1,22 @@
+{
+  "mysql": {
+    "url": "localhost:3306",
+    "username": "root",
+    "password": "password",
+    "database": "adproof"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8090
+  },
+  "solana_rpc_url": "http://127.0.0.1:8899",
+  "solana_keypair": "fHRRSEn7Qzbf7sHcmaPWDbSE1utfpWKG6oG3XMLRGSskRM3kKnp4oeZybHF1AnZA3KKyPKNtt4QVtjhGBrJRWkT",
+  "solana_registry_pubkey": "45fGev1BLo11hoNtTAk25wVcJeVSza9RMiAZ4jUXW8mZ",
+  "solana_program_id": "CGZST4ic7TB5Mr71LvCBPKV92kMqrSyzzWW6Sge4FqaV",
+  "storage": {
+    "local_storage_path": "./data",
+    "enable_chain_storage": true,
+    "enable_ipfs_storage": false,
+    "ipfs_gateway_url": "https://ipfs.io/ipfs/"
+  }
+}

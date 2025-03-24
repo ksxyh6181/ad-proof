@@ -1,0 +1,21 @@
+**target
+/data/log
+# /data/_web
+/data/_upload
+.idea
+*.http
+.git
+.vscode
+/tests
+.env
+fleet.toml
+/config/cert
+*.exe
+/test
+migration/data
+*.lock
+**pki
+**log
+**node_modules
+**.next
+**__pycache__
