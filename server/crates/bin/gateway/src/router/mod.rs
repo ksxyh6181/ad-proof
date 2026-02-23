@@ -40,7 +40,8 @@ pub fn init_router() -> Router {
         Router::with_path("api")
             .push(router::init_sys_router())
             .push(router::init_credential_router())
-            .push(router::init_financial_router()),
+            .push(router::init_financial_router())
+            .push(router::init_identity_router()),
     );
 
     let session_handler = SessionHandler::builder(CookieStore::new(), b"salvo-adminsalvo-adminalvo-adminsalvo-admin2023salvo-admin2023salvo-admin2023")

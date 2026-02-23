@@ -124,24 +124,22 @@ const resultCredential = ref<FinancialCredential | null>(null)
 const submitForm = async () => {
   if (!formRef.value) return
   
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        const res = await financialApi.issueCreditScore(form)
-        resultCredential.value = res.data?.data?.credential || null
-        dialogVisible.value = true
-        ElMessage.success('信用评分证明已成功颁发')
-      } catch (error: any) {
-        ElMessage.error(error.message || '颁发失败，请重试')
-      } finally {
-        loading.value = false
-      }
-    } else {
-      ElMessage.warning('请完成表单填写')
-      return false
+  const valid = await formRef.value.validate().catch(() => false)
+  if (valid) {
+    loading.value = true
+    try {
+      const res = await financialApi.issueCreditScore(form)
+      resultCredential.value = res.data?.data?.credential || null
+      dialogVisible.value = true
+      ElMessage.success('信用评分证明已成功颁发')
+    } catch (error: any) {
+      ElMessage.error(error.message || '颁发失败，请重试')
+    } finally {
+      loading.value = false
     }
-  })
+  } else {
+    ElMessage.warning('请完成表单填写')
+  }
 }
 
 const resetForm = () => {

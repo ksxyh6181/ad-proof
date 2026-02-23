@@ -97,10 +97,8 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed } from 'vue'
-import { ElMessage, ElForm } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { financialApi } from '@/api/financial'
-import type { FinancialCredential } from '@/types/financial'
 
 const formRef = ref<FormInstance>()
 

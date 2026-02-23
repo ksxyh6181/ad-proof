@@ -154,6 +154,20 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/identity',
+    component: Layout,
+    redirect: '/identity/index',
+    meta: { title: 'AI 数字身份' },
+    children: [
+      {
+        path: 'index',
+        name: 'IdentityIndex',
+        component: () => import('@/views/identity/index.vue'),
+        meta: { title: 'AI 身份管理', icon: 'el-icon-user-solid' }
+      }
+    ]
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
@@ -165,24 +179,24 @@ const router = createRouter({
 })
 
 // 全局前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   // 获取导航目标的路由配置
   const matchedRoutes = to.matched
   // 检查是否需要特定角色
-  const requiresRole = matchedRoutes.some(record => record.meta.roles && record.meta.roles.length > 0)
-  
+  const requiresRole = matchedRoutes.some(record => record.meta.roles && (record.meta.roles as string[]).length > 0)
+
   if (requiresRole) {
     // 获取当前角色
     const currentRole = localStorage.getItem('role') || ''
-    
+
     // 检查角色是否有权访问
     const hasPermission = matchedRoutes.every(record => {
-      if (record.meta.roles && record.meta.roles.length > 0) {
-        return record.meta.roles.includes(currentRole)
+      if (record.meta.roles && (record.meta.roles as string[]).length > 0) {
+        return (record.meta.roles as string[]).includes(currentRole)
       }
       return true
     })
-    
+
     if (hasPermission) {
       next()
     } else {

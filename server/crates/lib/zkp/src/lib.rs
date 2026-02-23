@@ -1,10 +1,12 @@
 pub mod credential;
 mod zkp;
 pub mod financial_zkp;
+pub mod identity;
 
 pub use credential::*;
 pub use zkp::*;
 pub use financial_zkp::*;
+pub use identity::*;
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;

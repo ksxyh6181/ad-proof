@@ -118,75 +118,73 @@ const resultCredential = ref<FinancialCredential | null>(null)
 const submitForm = async () => {
   if (!formRef.value) return
   
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        // 确保personal_id不为空且格式正确
-        if (!form.personal_id.trim()) {
-          form.personal_id = `user_${Math.floor(Math.random() * 10000)}`
-        }
-        
-        // 确保actual_income为正数
-        if (form.actual_income <= 0) {
-          form.actual_income = 5000
-        }
-        
-        // 确保issuer_id不为空
-        if (!form.issuer_id.trim()) {
-          form.issuer_id = 'financial_institution_001'
-        }
-        
-        // 确保过期日期有效
-        if (!form.expiry_date) {
-          form.expiry_date = getOneYearLater()
-        }
-        
-        console.log('预处理后的表单数据:', form)
-        
-        // 调用后端API
-        const response = await financialApi.issueIncomeProof({
-          personal_id: form.personal_id.trim(),
-          actual_income: form.actual_income,
-          issuer_id: form.issuer_id.trim(),
-          expiry_date: form.expiry_date
-        })
-        
-        console.log('Response from server:', response)
-        
-        // 处理响应数据结构
-        if (response && response.data && response.data.credential) {
-          resultCredential.value = response.data.credential
-        } else if (response && response.credential) {
-          resultCredential.value = response.credential
-        } else if (response && response.hash) {
-          // 如果只有哈希返回，手动构建凭证对象
-          resultCredential.value = {
-            personal_id: form.personal_id,
-            credential_type: 'income',
-            issuer_id: form.issuer_id,
-            issue_date: new Date().toISOString().split('T')[0],
-            expiry_date: form.expiry_date,
-            hash: response.hash,
-            income_level: determineIncomeLevel(form.actual_income)
-          }
-        } else {
-          throw new Error('无法获取凭证信息')
-        }
-        
-        dialogVisible.value = true
-        ElMessage.success('收入证明已成功颁发')
-      } catch (error: any) {
-        console.error('Error submitting form:', error)
-        ElMessage.error(error.message || '颁发失败，请重试')
-      } finally {
-        loading.value = false
+  const valid = await formRef.value.validate().catch(() => false)
+  if (valid) {
+    loading.value = true
+    try {
+      // 确保personal_id不为空且格式正确
+      if (!form.personal_id.trim()) {
+        form.personal_id = `user_${Math.floor(Math.random() * 10000)}`
       }
-    } else {
-      ElMessage.warning('请完成表单填写')
-      return false
+      
+      // 确保actual_income为正数
+      if (form.actual_income <= 0) {
+        form.actual_income = 5000
+      }
+      
+      // 确保issuer_id不为空
+      if (!form.issuer_id.trim()) {
+        form.issuer_id = 'financial_institution_001'
+      }
+      
+      // 确保过期日期有效
+      if (!form.expiry_date) {
+        form.expiry_date = getOneYearLater()
+      }
+      
+      console.log('预处理后的表单数据:', form)
+      
+      // 调用后端API
+      const response = await financialApi.issueIncomeProof({
+        personal_id: form.personal_id.trim(),
+        actual_income: form.actual_income,
+        issuer_id: form.issuer_id.trim(),
+        expiry_date: form.expiry_date
+      })
+      
+      console.log('Response from server:', response)
+      
+      // 处理响应数据结构
+      if (response && response.data && response.data.credential) {
+        resultCredential.value = response.data.credential
+      } else if (response && response.credential) {
+        resultCredential.value = response.credential
+      } else if (response && response.hash) {
+        // 如果只有哈希返回，手动构建凭证对象
+        resultCredential.value = {
+          personal_id: form.personal_id,
+          credential_type: 'income',
+          issuer_id: form.issuer_id,
+          issue_date: new Date().toISOString().split('T')[0],
+          expiry_date: form.expiry_date,
+          hash: response.hash,
+          income_level: determineIncomeLevel(form.actual_income)
+        } as any
+      } else {
+        throw new Error('无法获取凭证信息')
+      }
+      
+      dialogVisible.value = true
+      ElMessage.success('收入证明已成功颁发')
+    } catch (error: any) {
+      console.error('Error submitting form:', error)
+      ElMessage.error(error.message || '颁发失败，请重试')
+    } finally {
+      loading.value = false
     }
-  })
+  } else {
+    ElMessage.warning('请完成表单填写')
+  }
 }
 
 // 根据收入金额确定收入等级

@@ -38,7 +38,7 @@
             </div>
 
             <div class="verification-actions">
-              <el-button type="success" :loading="verifying" @click="verifyCredential">
+              <el-button type="success" :loading="verifying" @click="handleVerify">
                 {{ verifying ? '验证中...' : '验证证书' }}
               </el-button>
               <el-button @click="resetForm">取消</el-button>
@@ -134,7 +134,7 @@ const fetchCredential = async () => {
         return
       }
       
-      fetchedCredential.value = result.credential
+      fetchedCredential.value = result.credential || null
       
     } catch (error: any) {
       console.error('Fetch credential error:', error)
@@ -145,7 +145,7 @@ const fetchCredential = async () => {
   })
 }
 
-const verifyCredential = async () => {
+const handleVerify = async () => {
   if (!fetchedCredential.value) {
     ElMessage.error('缺少必要的证书数据，无法验证')
     return

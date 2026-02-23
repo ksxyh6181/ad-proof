@@ -18,13 +18,19 @@ export interface VerifyData {
 export interface Credential {
   id?: string;
   hash: string;
-  type: string;
-  issuer: string;
-  issueDate: string;
+  type?: string;
+  issuer?: string;
+  issueDate?: string;
   metadataUri?: string;
   revoked?: boolean;
   onChain?: boolean;
   signature?: string;
+  student_id?: string;
+  name?: string;
+  degree?: string;
+  graduation_date?: string;
+  public_inputs?: any;
+  proof?: any;
 }
 
 /**

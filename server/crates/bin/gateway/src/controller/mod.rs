@@ -3,3 +3,4 @@ pub mod credential_controller;
 pub mod financial_controller;
 pub mod common_controller;
 pub mod swagger_controller;
+pub mod identity_controller;

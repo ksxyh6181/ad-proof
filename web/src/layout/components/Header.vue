@@ -14,6 +14,7 @@
           <el-menu-item index="/home">首页</el-menu-item>
           <el-menu-item index="/credential">学历凭证</el-menu-item>
           <el-menu-item index="/financial">金融凭证</el-menu-item>
+          <el-menu-item index="/identity">AI数字身份</el-menu-item>
         </el-menu>
       </div>
     </div>
@@ -54,6 +55,7 @@ const activeApp = computed(() => {
   const path = route.path
   if (path.startsWith('/credential')) return '/credential'
   if (path.startsWith('/financial')) return '/financial'
+  if (path.startsWith('/identity')) return '/identity'
   return '/home'
 })
 

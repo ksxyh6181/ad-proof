@@ -172,7 +172,7 @@ const error = ref('');
 const success = ref('');
 const transaction = ref('');
 const verificationResult = ref<boolean | null>(null);
-const credentialInfo = ref(null);
+const credentialInfo = ref<any>(null);
 const debugInfo = ref<{
   onChain: boolean | null;
   credential?: any;
@@ -227,7 +227,7 @@ async function registerCredential() {
       error.value = '凭证注册失败，没有返回有效结果';
       debug.log('ERROR', '凭证注册失败，无效结果', result);
     }
-  } catch (err) {
+  } catch (err: any) {
     error.value = `凭证注册失败: ${err.message}`;
     debug.log('ERROR', '凭证注册异常', err);
   } finally {
@@ -287,7 +287,7 @@ async function checkHashOnChain() {
       error.value = `哈希未上链: ${registerForm.hash}`;
       debug.log('UI', `哈希未上链: ${registerForm.hash}`, result.message);
     }
-  } catch (err) {
+  } catch (err: any) {
     debugInfo.value = {
       onChain: null,
       error: err.message,
@@ -327,7 +327,7 @@ async function verifyCredential() {
       error.value = `凭证验证失败: ${verifyForm.hash}`;
       debug.log('UI', '凭证验证失败', result);
     }
-  } catch (err) {
+  } catch (err: any) {
     error.value = `验证凭证失败: ${err.message}`;
     debug.log('ERROR', '验证凭证异常', err);
   } finally {
@@ -358,7 +358,7 @@ async function getCredential() {
       error.value = `未找到凭证: ${viewForm.hash}`;
       debug.log('UI', '未找到凭证', { hash: viewForm.hash });
     }
-  } catch (err) {
+  } catch (err: any) {
     error.value = `获取凭证失败: ${err.message}`;
     debug.log('ERROR', '获取凭证异常', err);
   } finally {
@@ -367,7 +367,7 @@ async function getCredential() {
 }
 
 // 格式化日期
-function formatDate(timestamp) {
+function formatDate(timestamp: any) {
   if (!timestamp) return 'N/A';
   
   // Anchor BN对象需要转换
@@ -382,7 +382,7 @@ function formatDate(timestamp) {
 }
 
 // 格式化IPFS URL为可访问的网关URL
-function formatIpfsUrl(uri) {
+function formatIpfsUrl(uri: any) {
   if (!uri) return '#';
   if (uri.startsWith('ipfs://')) {
     return uri.replace('ipfs://', 'https://ipfs.io/ipfs/');
@@ -391,7 +391,7 @@ function formatIpfsUrl(uri) {
 }
 
 // 获取交易浏览器URL
-function getExplorerUrl(signature) {
+function getExplorerUrl(signature: any) {
   // 默认使用devnet
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
 }

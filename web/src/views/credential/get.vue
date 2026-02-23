@@ -96,10 +96,10 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { getAllCredentials } from '@/api/credential'
+import { getCredential } from '@/api/credential'
 import type { Credential } from '@/types/credential';
 import { Search } from '@element-plus/icons-vue'
-import QRCode from 'qrcode';
+
 
 const route = useRoute()
 const router = useRouter()
@@ -193,7 +193,7 @@ const handleSearch = async () => {
     credential.value = null
     
     try {
-      const result = await getAllCredentials(form.value.hash)
+      const result = await getCredential(form.value.hash)
       
       if (!result) {
         error.value = '未找到该证书'

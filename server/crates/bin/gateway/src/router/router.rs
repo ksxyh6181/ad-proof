@@ -1,4 +1,4 @@
-use crate::controller::{system_controller, credential_controller, financial_controller};
+use crate::controller::{system_controller, credential_controller, financial_controller, identity_controller};
 use salvo::Router;
 use crate::controller::credential_controller::VerifyCredentialRequest;
 use crate::middleware::{AuthMiddleware, Role};
@@ -64,5 +64,25 @@ pub fn init_financial_router() -> Router {
             Router::new()
                 .path("/list")
                 .post(financial_controller::list_credentials)
+        )
+}
+
+pub fn init_identity_router() -> Router {
+    Router::new()
+        .path("/identity")
+        .push(
+            Router::new()
+                .path("/create")
+                .post(identity_controller::create_identity)
+        )
+        .push(
+            Router::new()
+                .path("/agent/register")
+                .post(identity_controller::register_agent)
+        )
+        .push(
+            Router::new()
+                .path("/agent/verify")
+                .post(identity_controller::verify_agent)
         )
 }

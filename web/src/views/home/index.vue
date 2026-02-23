@@ -96,7 +96,6 @@ import {
   Search, 
   School, 
   Money, 
-  Wallet, 
   Star, 
   Location,
   Lock,

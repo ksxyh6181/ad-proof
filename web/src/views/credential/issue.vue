@@ -116,13 +116,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { credentialApi } from '../../api/credential'
-import type { CredentialData } from '../../types/credential'
-import { UserFilled, Avatar, Notebook, Calendar, ArrowLeft, School } from '@element-plus/icons-vue'
+import { issueCredential } from '@/api/credential'
+import type { CredentialData } from '@/types/credential'
+import { UserFilled, Avatar, Notebook, Calendar, ArrowLeft } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const formRef = ref<FormInstance>()
@@ -199,7 +199,7 @@ const copyHash = () => {
   }
 }
 
-const handleSubmit = async (event: Event) => {
+const handleSubmit = async () => {
   if (!formRef.value) return
   
   if (!isEducationInstitution.value) {
@@ -225,7 +225,7 @@ const handleSubmit = async (event: Event) => {
       const { major, ...dataToSubmit } = submitData
       
       console.log('提交数据:', dataToSubmit)
-      const result = await credentialApi.issue(dataToSubmit)
+      const result = await issueCredential(dataToSubmit as any)
       console.log('服务器响应:', result)
       
       ElMessage.success('证书颁发成功')

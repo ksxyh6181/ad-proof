@@ -184,7 +184,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { financialApi } from '@/api/financial'
 import type { FinancialCredential } from '@/types/financial'
