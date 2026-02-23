@@ -22,14 +22,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { User, School, OfficeBuilding, Check, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-
-interface RoleOption {
-  value: string
-  label: string
-  icon?: string
-}
 
 // 定义可用角色
 const availableRoles = [

@@ -69,7 +69,7 @@ const filteredLogs = computed(() => {
 });
 
 // 格式化时间戳
-function formatTime(timestamp: string) {
+const formatTime = (timestamp: any) => {
   const date = new Date(timestamp);
   return date.toLocaleTimeString() + '.' + date.getMilliseconds().toString().padStart(3, '0');
 }

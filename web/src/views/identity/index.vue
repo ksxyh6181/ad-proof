@@ -105,13 +105,9 @@ const handleCreateIdentity = async () => {
   loading.value = true
   try {
     const res: any = await createIdentity({ personal_id: identityForm.personal_id })
-    if (res.code === 200) {
-      ElMessage.success('创建成功')
-      personhoodHash.value = res.data.personhood_hash
-      agentForm.owner_personhood_hash = personhoodHash.value
-    } else {
-      ElMessage.error(res.message || '创建失败')
-    }
+    // request.ts interceptor already extracts data and handles code !== 200
+    personhoodHash.value = res.personhood_hash
+    agentForm.owner_personhood_hash = personhoodHash.value
   } catch (error) {
     ElMessage.error('API请求失败')
   } finally {
@@ -130,12 +126,7 @@ const handleRegisterAgent = async () => {
       owner_personhood_hash: agentForm.owner_personhood_hash,
       agent_pubkey: agentForm.agent_pubkey
     })
-    if (res.code === 200) {
-      ElMessage.success('注册成功')
-      lastAgentProof.value = res.data.proof
-    } else {
-      ElMessage.error(res.message || '注册失败')
-    }
+    lastAgentProof.value = res.proof
   } catch (error) {
     ElMessage.error('API请求失败')
   } finally {
@@ -148,16 +139,9 @@ const handleVerify = async (proof: any) => {
   verifyResult.value = null
   try {
     const res: any = await verifyAgent({ proof })
-    if (res.code === 200) {
-      verifyResult.value = {
-        valid: res.data.valid,
-        message: res.data.message
-      }
-    } else {
-      verifyResult.value = {
-        valid: false,
-        message: '验证请求失败'
-      }
+    verifyResult.value = {
+      valid: res.valid,
+      message: res.message
     }
   } catch (error) {
     ElMessage.error('API请求失败')

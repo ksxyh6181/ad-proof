@@ -185,8 +185,8 @@ export class SolanaCredentialClient {
       return !credentialInfo.revoked;
     } catch (error) {
       // 如果账户不存在，捕获错误
-      if (error.message.includes("Account does not exist") ||
-        error.message.includes("Not found")) {
+      if ((error as any).message.includes("Account does not exist") ||
+        (error as any).message.includes("Not found")) {
         debug.log('SOLANA', '凭证不存在', { hash });
         return false;
       }
@@ -335,8 +335,8 @@ export class SolanaCredentialClient {
     } catch (e: any) {
       const error = e as any;
       // 如果账户不存在，返回null
-      if (error.message.includes("Account does not exist") ||
-        error.message.includes("Not found")) {
+      if ((error as any).message?.includes("Account does not exist") ||
+        (error as any).message?.includes("Not found")) {
         debug.log('SOLANA', '凭证不存在', { hash });
         return null;
       }
@@ -346,35 +346,6 @@ export class SolanaCredentialClient {
         code: error.code
       });
       throw error;
-    }
-  }
-
-  /**
-   * 通过哈希查找凭证PDA
-   * @param hash 凭证哈希
-   * @returns 凭证PDA或null (如果找不到)
-   * @private
-   * @deprecated 请直接使用PDA计算
-   */
-  private async findCredentialByHash(hash: string): Promise<PublicKey | null> {
-    try {
-      // 这是一个简化的实现，实际上我们应该计算PDA
-      const [credentialPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("credential"),
-          this.registryPubkey.toBuffer(),
-          Buffer.from(this.formatHash(hash))
-        ],
-        this.program.programId
-      );
-
-      // 尝试获取账户以确认它的存在
-      await this.program.account.credential.fetch(credentialPda);
-
-      return credentialPda;
-    } catch (error: any) { // Explicitly type error as any for now, or handle specific error types
-      debug.log('ERROR', '查找凭证PDA失败', { error: error.message });
-      return null;
     }
   }
 

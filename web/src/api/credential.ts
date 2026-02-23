@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { SolanaCredentialClient } from '../utils/solana-client';
-import { Connection, PublicKey, Keypair } from '@solana/web3.js';
+import { Connection, Keypair } from '@solana/web3.js';
 import type { Credential, CredentialIssueParams, CredentialVerifyParams, SolanaCredentialResult } from '../types/credential';
 
 
@@ -35,12 +35,15 @@ export const debug = {
     };
 
     console.log(
-      `%c[${type}] ${message}`,
-      styles[type] || styles.OTHER,
-      data || ''
+      styles[type as keyof typeof styles] || styles.OTHER,
     );
 
     return logEntry;
+  },
+
+  // 获取日志
+  getLogs() {
+    return this.logs;
   },
 
   // 清除日志
@@ -82,7 +85,8 @@ export async function issueCredential(params: CredentialIssueParams): Promise<Cr
         const result = await registerCredentialOnChain(credential);
 
         debug.log('API', '凭证上链结果', result);
-      } catch (error) {
+      } catch (e: any) {
+        const error = e as any;
         debug.log('ERROR', '凭证上链失败', {
           error: error.message,
           hash: credential.hash
@@ -91,7 +95,8 @@ export async function issueCredential(params: CredentialIssueParams): Promise<Cr
     }
 
     return credential;
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '凭证签发API请求失败', {
       error: error.message,
       params
@@ -132,7 +137,8 @@ export async function verifyCredential(params: CredentialVerifyParams): Promise<
           valid: onChainValid,
           finalResult: result.valid
         });
-      } catch (error) {
+      } catch (e: any) {
+        const error = e as any;
         debug.log('ERROR', '链上验证失败', {
           error: error.message,
           hash: result.credential?.hash
@@ -141,7 +147,8 @@ export async function verifyCredential(params: CredentialVerifyParams): Promise<
     }
 
     return result;
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '凭证验证API请求失败', {
       error: error.message,
       params
@@ -166,7 +173,8 @@ export async function getAllCredentials(): Promise<Credential[]> {
     });
 
     return credentials;
-  } catch (error: any) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '获取所有凭证API请求失败', {
       error: error.message
     });
@@ -186,7 +194,8 @@ export async function getCredential(hash: string): Promise<Credential | null> {
 
     debug.log('API', '获取单个凭证成功', credential);
     return credential;
-  } catch (error: any) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '获取单个凭证失败', { error: error.message });
     throw error;
   }
@@ -239,14 +248,17 @@ export async function registerCredentialOnChain(credential: Credential): Promise
 
         await connection.confirmTransaction(signature);
         debug.log('SOLANA', 'SOL空投成功', { signature });
-      } catch (error) {
+      } catch (e: any) {
+        const error = e as any;
         debug.log('ERROR', 'SOL空投失败', { error: error.message });
         // 空投失败不应阻止后续操作，因为钱包可能已经有足够的SOL
       }
     }
 
     // 5. 注册凭证
-    const issueTimestamp = Math.floor(new Date(credential.issueDate).getTime() / 1000);
+    const issueTimestamp = credential.issueDate
+      ? Math.floor(new Date(credential.issueDate).getTime() / 1000)
+      : Math.floor(Date.now() / 1000);
 
     debug.log('SOLANA', '准备注册凭证', {
       hash: credential.hash,
@@ -258,8 +270,8 @@ export async function registerCredentialOnChain(credential: Credential): Promise
 
     const signature = await client.registerCredential(
       credential.hash,
-      credential.type,
-      credential.issuer,
+      credential.type || "未知类型",
+      credential.issuer || "未知颁发者",
       issueTimestamp,
       credential.metadataUri || ""
     );
@@ -274,7 +286,8 @@ export async function registerCredentialOnChain(credential: Credential): Promise
       signature,
       message: "凭证已成功注册到区块链"
     };
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '凭证注册到区块链失败', {
       error: error.message,
       logs: error.logs,
@@ -320,7 +333,8 @@ export async function verifyCredentialOnChain(hash: string): Promise<boolean> {
     });
 
     return isValid;
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '区块链凭证验证失败', {
       error: error.message,
       hash
@@ -363,7 +377,8 @@ export async function getCredentialFromChain(hash: string): Promise<any | null> 
     }
 
     return credentialInfo;
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '从区块链获取凭证信息失败', {
       error: error.message,
       hash
@@ -398,7 +413,8 @@ export async function checkCredentialOnChain(hash: string): Promise<SolanaCreden
         data: null
       };
     }
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     debug.log('ERROR', '检查凭证是否在链上失败', {
       error: error.message,
       hash
