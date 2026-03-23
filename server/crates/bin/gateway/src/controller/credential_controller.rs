@@ -8,7 +8,6 @@ use salvo::oapi::extract::JsonBody;
 use serde::{Deserialize, Serialize};
 use salvo::oapi::ToSchema;
 use serde_json::json;
-use blake3;
 use hex;
 
 #[derive(Debug, Deserialize, Serialize, ToSchema)]

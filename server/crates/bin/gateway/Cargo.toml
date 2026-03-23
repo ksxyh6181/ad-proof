@@ -28,7 +28,6 @@ serde.workspace = true
 serde_json.workspace = true
 rbatis.workspace = true
 lazy_static = "1.5.0"
-blake3 = "0.3.8"
 hex = "0.4.3"
 anyhow = "1.0.96"
 

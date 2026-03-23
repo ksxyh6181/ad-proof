@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use borsh::{BorshDeserialize, BorshSerialize};
 use log::{error, info};
-use solana_client::rpc_client::RpcClient;
+use solana_client_sdk::rpc_client::RpcClient;
 use solana_program::instruction::{AccountMeta, Instruction};
 use solana_program::pubkey::Pubkey;
 use solana_program::system_program;
