@@ -19,7 +19,7 @@ panic = 'abort'
 # strip = "symbols" # none(false) debuginfo symbols(true).
 
 [workspace.dependencies]
-salvo = { version = "0.76.2", features = [
+salvo = { version = "0.89.3", features = [
   "serve-static",
   "oapi",
   "logging",
