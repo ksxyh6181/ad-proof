@@ -1,7 +1,6 @@
 use crate::utils::res::{res_json_ok, Res};
 
-use salvo::prelude::*;
-use salvo::{oapi::endpoint, Writer};
+use salvo::oapi::endpoint;
 
 /// 系统状态测试
 #[endpoint(

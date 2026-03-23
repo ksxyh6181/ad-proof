@@ -1,6 +1,4 @@
-use crate::utils::res::res_json_custom;
-use log::info;
-use salvo::{handler, prelude::StatusCode, Depot, FlowCtrl, Request, Response};
+use salvo::{handler, Depot, FlowCtrl, Request, Response};
 use std::time::Instant;
 
 #[handler]

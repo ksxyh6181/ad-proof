@@ -1,4 +1,4 @@
-use salvo::{handler, prelude::StatusCode, Depot, FlowCtrl, Request, Response};
+use salvo::{handler, prelude::StatusCode, FlowCtrl, Request, Response};
 use tracing::{error, warn};
 
 use crate::utils::res::res_json_custom;

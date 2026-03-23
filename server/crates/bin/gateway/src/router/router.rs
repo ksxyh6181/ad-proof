@@ -1,88 +1,28 @@
-use crate::controller::{system_controller, credential_controller, financial_controller, identity_controller};
-use salvo::Router;
-use crate::controller::credential_controller::VerifyCredentialRequest;
+use crate::controller::{system_controller, vc_controller};
 use crate::middleware::{AuthMiddleware, Role};
+use salvo::Router;
 
 pub fn init_sys_router() -> Router {
-    let router = Router::with_path("/sys");
-    router.push(Router::with_path("/sys_account").get(system_controller::health_check))
+    Router::with_path("/sys").push(Router::with_path("/sys_account").get(system_controller::health_check))
 }
 
-pub fn init_credential_router() -> Router {
+pub fn init_vc_router() -> Router {
     Router::new()
-        .path("/credential")
+        .path("/vc")
         .push(
             Router::new()
-                .path("/issue")
-                .hoop(AuthMiddleware::new(Role::EducationInstitution))
-                .post(credential_controller::issue)
-        )
-        .push(
-            Router::new()
-                .path("/verify")
-                .post(credential_controller::verify)
-        )
-        .push(
-            Router::new()
-                .path("/get")
-                .post(credential_controller::get)
-        )
-}
-
-pub fn init_financial_router() -> Router {
-    Router::new()
-        .path("/financial")
-        .push(
-            Router::new()
-                .path("/income")
+                .path("/income/issue")
                 .hoop(AuthMiddleware::new(Role::FinancialInstitution))
-                .post(financial_controller::issue_income)
+                .post(vc_controller::issue_income),
         )
+        .push(Router::new().path("/income/present").post(vc_controller::present_income))
+        .push(Router::new().path("/income/verify").post(vc_controller::verify_income))
         .push(
             Router::new()
-                .path("/credit")
-                .hoop(AuthMiddleware::new(Role::FinancialInstitution))
-                .post(financial_controller::issue_credit_score)
+                .path("/kyc/issue")
+                .hoop(AuthMiddleware::new(Role::KycProvider))
+                .post(vc_controller::issue_kyc),
         )
-        .push(
-            Router::new()
-                .path("/cross_border")
-                .hoop(AuthMiddleware::new(Role::FinancialInstitution))
-                .post(financial_controller::issue_cross_border)
-        )
-        .push(
-            Router::new()
-                .path("/verify")
-                .post(financial_controller::verify)
-        )
-        .push(
-            Router::new()
-                .path("/get")
-                .post(financial_controller::get_credential)
-        )
-        .push(
-            Router::new()
-                .path("/list")
-                .post(financial_controller::list_credentials)
-        )
-}
-
-pub fn init_identity_router() -> Router {
-    Router::new()
-        .path("/identity")
-        .push(
-            Router::new()
-                .path("/create")
-                .post(identity_controller::create_identity)
-        )
-        .push(
-            Router::new()
-                .path("/agent/register")
-                .post(identity_controller::register_agent)
-        )
-        .push(
-            Router::new()
-                .path("/agent/verify")
-                .post(identity_controller::verify_agent)
-        )
+        .push(Router::new().path("/kyc/present").post(vc_controller::present_kyc))
+        .push(Router::new().path("/kyc/verify").post(vc_controller::verify_kyc))
 }

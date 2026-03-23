@@ -1,21 +1,16 @@
 use salvo::prelude::*;
-use salvo::http::header::HeaderValue;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Role {
-    EducationInstitution,
-    Student,
-    Employer,
     FinancialInstitution,
+    KycProvider,
 }
 
 impl Role {
     pub fn from_str(role: &str) -> Option<Self> {
         match role.to_lowercase().as_str() {
-            "education_institution" => Some(Role::EducationInstitution),
-            "student" => Some(Role::Student),
-            "employer" => Some(Role::Employer),
             "financial_institution" => Some(Role::FinancialInstitution),
+            "kyc_provider" => Some(Role::KycProvider),
             _ => None,
         }
     }
@@ -31,13 +26,6 @@ impl AuthError {
     pub fn unauthorized(msg: &str) -> Self {
         Self {
             code: 401,
-            message: msg.to_string(),
-        }
-    }
-
-    pub fn forbidden(msg: &str) -> Self {
-        Self {
-            code: 403,
             message: msg.to_string(),
         }
     }
