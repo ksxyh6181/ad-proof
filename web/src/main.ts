@@ -9,13 +9,12 @@ import './styles/index.css'
 
 const app = createApp(App)
 
-// 注册所有图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
 app.use(ElementPlus, {
-  locale: zhCn,
+  locale: zhCn
 })
 app.use(router)
 app.mount('#app')

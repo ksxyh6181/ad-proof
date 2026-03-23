@@ -1,27 +1,29 @@
 <template>
-  <div class="header">
-    <div class="logo-container">
-      <h1 class="logo">AdProof</h1>
-    </div>
-    
-    <div class="nav-container">
-      <div class="app-nav">
-        <el-menu
-          :default-active="activeApp"
-          mode="horizontal"
-          @select="handleAppSelect"
-        >
-          <el-menu-item index="/home">首页</el-menu-item>
-          <el-menu-item index="/credential">学历凭证</el-menu-item>
-          <el-menu-item index="/financial">金融凭证</el-menu-item>
-          <el-menu-item index="/identity">AI数字身份</el-menu-item>
-        </el-menu>
+  <div class="header-shell">
+    <button class="brand" type="button" @click="router.push('/home')">
+      <span class="brand-mark">AP</span>
+      <div class="brand-copy">
+        <strong>Ad Proof</strong>
+        <span>Selective Disclosure VC Demo</span>
       </div>
-    </div>
-    
-    <div class="role-selector">
-      <span class="label">当前角色：</span>
-      <el-select v-model="currentRole" @change="handleRoleChange">
+    </button>
+
+    <nav class="nav">
+      <button
+        v-for="item in navItems"
+        :key="item.path"
+        class="nav-link"
+        :class="{ active: activePath === item.path }"
+        type="button"
+        @click="router.push(item.path)"
+      >
+        {{ item.label }}
+      </button>
+    </nav>
+
+    <div class="role-panel">
+      <span class="role-label">当前请求角色</span>
+      <el-select v-model="currentRole" size="large" @change="handleRoleChange">
         <el-option
           v-for="role in roles"
           :key="role.value"
@@ -29,134 +31,186 @@
           :value="role.value"
         />
       </el-select>
+      <small class="role-note">签发接口校验角色，生成与验证接口对角色开放。</small>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { DEMO_ROLES, getStoredRole, setStoredRole, type DemoRole } from '@/utils/role'
 
 const route = useRoute()
 const router = useRouter()
 
-const roles = [
-  { label: '教育机构', value: 'education_institution' },
-  { label: '毕业生', value: 'student' },
-  { label: '雇主', value: 'employer' },
-  { label: '金融机构', value: 'financial_institution' },
-  { label: '个人用户', value: 'individual' },
-  { label: '验证方', value: 'verifier' }
+const navItems = [
+  { path: '/home', label: '首页' },
+  { path: '/income', label: '收入门槛证明' },
+  { path: '/kyc', label: 'KYC 等级证明' }
 ]
 
-const currentRole = ref('')
-const activeApp = computed(() => {
-  const path = route.path
-  if (path.startsWith('/credential')) return '/credential'
-  if (path.startsWith('/financial')) return '/financial'
-  if (path.startsWith('/identity')) return '/identity'
+const roles = DEMO_ROLES
+const currentRole = ref<DemoRole>(getStoredRole())
+const activePath = computed(() => {
+  if (route.path.startsWith('/income')) {
+    return '/income'
+  }
+  if (route.path.startsWith('/kyc')) {
+    return '/kyc'
+  }
   return '/home'
 })
 
-onMounted(() => {
-  const savedRole = localStorage.getItem('role')
-  if (savedRole && roles.some(role => role.value === savedRole)) {
-    currentRole.value = savedRole
-  } else {
-    // 默认角色为教育机构
-    currentRole.value = 'education_institution'
-    localStorage.setItem('role', 'education_institution')
-  }
-})
-
-const handleRoleChange = (value: string) => {
-  localStorage.setItem('role', value)
-  ElMessage.success(`已切换到${roles.find(role => role.value === value)?.label}角色`)
-  
-  // 根据角色自动切换到相应的应用
-  if (['education_institution', 'student', 'employer'].includes(value)) {
-    if (!route.path.startsWith('/credential') && route.path !== '/home') {
-      router.push('/credential')
-    }
-  } else if (['financial_institution', 'individual', 'verifier'].includes(value)) {
-    if (!route.path.startsWith('/financial') && route.path !== '/home') {
-      router.push('/financial')
-    }
-  }
+const syncRole = () => {
+  currentRole.value = getStoredRole()
 }
 
-const handleAppSelect = (index: string) => {
-  // 验证角色与应用的匹配关系
-  const currentRoleValue = currentRole.value
-  let needsRoleChange = false
-  
-  if (index === '/credential' && !['education_institution', 'student', 'employer'].includes(currentRoleValue)) {
-    ElMessage.warning('您当前角色不适用于学历凭证系统，已自动切换为教育机构角色')
-    localStorage.setItem('role', 'education_institution')
-    currentRole.value = 'education_institution'
-    needsRoleChange = true
-  } else if (index === '/financial' && !['financial_institution', 'individual', 'verifier'].includes(currentRoleValue)) {
-    ElMessage.warning('您当前角色不适用于金融凭证系统，已自动切换为金融机构角色')
-    localStorage.setItem('role', 'financial_institution')
-    currentRole.value = 'financial_institution'
-    needsRoleChange = true
-  }
-  
-  // 导航逻辑，如果角色改变则添加延时
-  console.log('Navigating to:', index)
-  if (needsRoleChange) {
-    setTimeout(() => {
-      router.push(index)
-    }, 100)
-  } else {
-    router.push(index)
-  }
+onMounted(() => {
+  syncRole()
+  window.addEventListener('storage', syncRole)
+  window.addEventListener('role-change', syncRole as EventListener)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', syncRole)
+  window.removeEventListener('role-change', syncRole as EventListener)
+})
+
+const handleRoleChange = (value: DemoRole) => {
+  setStoredRole(value)
+  const label = roles.find((role) => role.value === value)?.label ?? value
+  ElMessage.success(`已切换到${label}`)
 }
 </script>
 
 <style scoped>
-.header {
-  padding: 0;
-  height: 60px;
+.header-shell {
+  height: 72px;
+  width: min(1240px, calc(100% - 24px));
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #eee;
-  background-color: white;
+  gap: 20px;
+  padding: 10px 0;
 }
 
-.logo-container {
-  padding: 0 20px;
-  display: flex;
+.brand {
+  display: inline-flex;
   align-items: center;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  padding: 0;
 }
 
-.logo {
-  margin: 0;
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--el-color-primary);
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff8e8;
+  background: linear-gradient(135deg, #c46d2d, #386c67);
+  box-shadow: 0 12px 30px rgba(56, 108, 103, 0.18);
 }
 
-.nav-container {
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.brand-copy strong {
+  font-size: 1rem;
+  color: var(--ap-text-strong);
+}
+
+.brand-copy span {
+  font-size: 0.74rem;
+  color: var(--ap-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.nav {
   flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
-.app-nav {
+.nav-link {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ap-text-muted);
+}
+
+.nav-link.active {
+  color: var(--ap-text-strong);
+  background: rgba(255, 248, 232, 0.9);
+  border-color: rgba(196, 109, 45, 0.14);
+  box-shadow: var(--ap-shadow-soft);
+}
+
+.role-panel {
+  min-width: 260px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
-.role-selector {
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
+.role-label {
+  font-size: 0.82rem;
+  color: var(--ap-text-muted);
 }
 
-.label {
-  margin-right: 10px;
+.role-note {
+  color: var(--ap-text-soft);
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .header-shell {
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .role-panel {
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand-copy span,
+  .role-note {
+    display: none;
+  }
+
+  .role-panel {
+    width: 100%;
+  }
+
+  .nav-link {
+    white-space: nowrap;
+  }
 }
 </style>

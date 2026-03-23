@@ -1,7 +1,7 @@
 use crate::controller::{common_controller, swagger_controller, system_controller};
 use crate::router::middware::route_logger;
 use salvo::catcher::Catcher;
-use salvo::cors::Cors;
+use salvo::cors::{Any, Cors};
 use salvo::http::Method;
 use salvo::logging::Logger;
 use salvo::oapi::swagger_ui::SwaggerUi;
@@ -17,15 +17,9 @@ pub mod router;
 pub fn init_router() -> Router {
     let static_dir = Router::with_path("/static/<*path>").get(StaticDir::new(["static/"]).auto_list(true));
 
-    let cors = Cors::new()
-        .allow_origin("http://127.0.0.1:3000")
-        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::OPTIONS, Method::DELETE])
-        .into_handler();
-
     let base_router = Router::new()
         .hoop(Logger::new())
         .hoop(CatchPanic::new())
-        .hoop(cors)
         .push(static_dir)
         .push(Router::with_path("/actuator/health").get(system_controller::health_check));
 
@@ -57,7 +51,13 @@ pub fn init_router() -> Router {
 
 pub fn init_service() -> Service {
     let router = init_router();
+    let cors = Cors::new()
+        .allow_origin(Any)
+        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::PATCH, Method::OPTIONS, Method::DELETE])
+        .allow_headers(Any)
+        .into_handler();
     Service::new(router)
+        .hoop(cors)
         .catcher(Catcher::default().hoop(common_controller::catcher_err))
         .hoop(route_logger)
 }
